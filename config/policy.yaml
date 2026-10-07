@@ -1,0 +1,70 @@
+# =============================================================================
+# config/policy.yaml
+# -----------------------------------------------------------------------------
+# 👔 TRADE MARKETING + ⚖️ PHÁP CHẾ SỞ HỮU FILE NÀY.
+#
+# ❌ Codex KHÔNG được thêm hành động vào permitted_actions.
+# ❌ Codex KHÔNG được thêm bất kỳ nhánh code nào đổi giá, mức chiết khấu,
+#    tỷ lệ scan rebate, ngày chạy chương trình hay điều khoản nhà bán lẻ.
+#
+# ⚖️ CƠ SỞ PHÁP LÝ cho danh sách cấm (spec §2.5):
+#   - Luật Thương mại 2005, Điều 96: phải THỰC HIỆN ĐÚNG chương trình khuyến mại đã thông báo.
+#   - Nghị định 81/2018, Điều 22: KHÔNG được chấm dứt chương trình trước thời hạn, trừ 3 trường hợp
+#     (bất khả kháng / hàng khuyến mại đã hết / cơ quan nhà nước yêu cầu).
+#   - Thông tư 39/2025/TT-BCT: mức giảm tối đa 50% (100% trong chương trình khuyến mại tập trung).
+#
+# Nguồn giá trị mặc định: spec Phụ lục C. Chốt cuối: Business/02-task-business.md §5.
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# DANH SÁCH ĐÓNG. Agent chỉ được chọn trong đây. Không được tự tạo hành động mới.
+# Schema đầu ra (snapshot.py) chỉ biểu diễn được các hành động này.
+# -----------------------------------------------------------------------------
+permitted_actions:
+  - REALLOCATE_UNCOMMITTED_FUNDS   # chuyển tiền tùy nghi CHƯA cam kết, cùng nguồn quỹ
+  - ESCALATE_STOCKOUT              # báo cửa hàng hết hàng cho KAM + chuỗi cung ứng
+  - ESCALATE_PRICE_COMPLIANCE      # báo cửa hàng không áp giá khuyến mãi đã thỏa thuận
+  - DEFER_DISCRETIONARY_SPEND      # hoãn chi tùy nghi chưa cam kết
+  - PREPARE_VARIANCE_DOSSIER       # soạn hồ sơ bằng chứng cho kỳ đàm phán sau
+  - MONITOR                        # CHỦ ĐỘNG không hành động khi chưa đủ bằng chứng
+
+# -----------------------------------------------------------------------------
+# KHÔNG BAO GIỜ đề xuất khi chương trình đang chạy.
+# Validator quét văn bản của LLM theo mẫu EN + VI để chặn các ý định này.
+# -----------------------------------------------------------------------------
+forbidden_levers:
+  - shelf_price                           # đã in trên tờ rơi, niêm yết tại kệ
+  - discount_depth                        # đã công bố với người mua
+  - scan_rebate_rate_or_funding_split     # đã ký với nhà bán lẻ
+  - promotion_dates_or_cancellation       # NĐ 81/2018 Điều 22
+  - retailer_contract_terms               # thuộc kỳ đàm phán sau
+
+# -----------------------------------------------------------------------------
+# Luật phân bổ lại tiền (tất định, CHẠY TRƯỚC LLM).
+# LLM chỉ chọn và giải thích trong số ứng viên engine đã tính sẵn.
+# -----------------------------------------------------------------------------
+reallocation:
+  movable_commitment_states: [UNCOMMITTED]   # tiền đã hứa thì không đụng
+  same_fund_pool_only: true                  # không chuyển ngang nhãn hàng / ngang kênh
+  min_elapsed_days: 7                        # đủ 1 chu kỳ thứ-trong-tuần
+  recipient_min_remaining_days: 7            # còn đủ thời gian để tiền có tác dụng
+  donor_max_projected_roi_vs_plan: 0.90      # bên CHO phải đang kém >= 10% kế hoạch
+  recipient_min_projected_roi_vs_plan: 1.10  # bên NHẬN phải đang vượt >= 10%
+  max_share_of_recipient_lump_sum_budget: 0.30   # trần: trưng bày + MDF kế hoạch của bên nhận
+
+  # Cách đo giá trị BIÊN của đòn bẩy sẽ mua.
+  #   within_promo_split = so sánh cửa hàng CÓ vs KHÔNG CÓ đòn bẩy, NGAY TRONG chương trình nhận.
+  #   average_roi        = dự phòng khi không có nhóm so sánh -> độ tin cậy "thấp".
+  marginal_method: within_promo_split
+  # Haircut 0.70 trừ thiên lệch chọn mẫu (cửa hàng được làm trưng bày trước có thể
+  # vốn đã là cửa hàng tốt hơn) và "lời nguyền của người tối ưu".
+  # Hệ thống LUÔN công bố kèm breakeven_haircut để người duyệt tự phán đoán.
+  marginal_haircut: 0.70
+
+approval:
+  required_for:
+    - REALLOCATE_UNCOMMITTED_FUNDS
+    - DEFER_DISCRETIONARY_SPEND
+  approver_role: trade_marketing_manager
+  # TODO(B-agent): mọi quyết định duyệt/từ chối/hoãn phải ghi vào NHẬT KÝ KIỂM TOÁN
+  #                kèm LÝ DO BẮT BUỘC. Không có lý do -> không cho submit.

@@ -1,0 +1,4 @@
+sku_id,brand,category,pack,regular_price_vnd,net_price_to_retailer_vnd,unit_cogs_vnd
+SKU-A18,Brand A,Instant coffee,18 sticks,60000,46000,22000
+SKU-A12,Brand A,Instant coffee,12 sticks,42000,32000,15000
+SKU-B12,Brand B,Instant coffee,12 sticks,40000,30000,15000

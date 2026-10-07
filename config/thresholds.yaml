@@ -1,0 +1,70 @@
+# =============================================================================
+# config/thresholds.yaml
+# -----------------------------------------------------------------------------
+# 👔 TRADE MARKETING SỞ HỮU FILE NÀY. Chỉ đổi qua pull request có review.
+# ❌ Codex KHÔNG được tự đổi giá trị ở đây. Cần ngưỡng khác → hỏi người.
+#
+# Nguồn giá trị mặc định: spec Phụ lục C.
+# Chốt giá trị cuối: Business/02-task-business.md §4.
+#
+# 🎯 Nguyên tắc đánh đổi:
+#   Báo động giả làm mất lòng tin NHANH HƠN việc bỏ sót.
+#   - Cảnh báo THỰC THI (hết hàng, sai giá): phát ngay khi bằng chứng rõ về thống kê.
+#     Xử lý chúng rẻ, nên sai một chút vẫn chấp nhận được.
+#   - Cảnh báo dẫn tới CHUYỂN TIỀN: phải chờ đủ một chu kỳ thứ-trong-tuần (7 ngày)
+#     và chênh lệch vẫn kéo dài. Chuyển tiền sai thì tốn kém và khó rút lại.
+# =============================================================================
+
+evaluation:
+  pos_lag_days: 1                   # POS ngày D về lúc 06:00 ngày D+1
+  min_elapsed_days_early: 3         # cảnh báo SỚM (mức Trung bình) từ ngày 3
+  min_elapsed_days_confirmed: 7     # đủ 1 chu kỳ thứ-trong-tuần trước khi cho phép chuyển tiền
+  min_store_coverage: 0.80          # dưới mức này -> COVERAGE_GAP -> CHẶN cảnh báo ROI
+  projection_window_days: 3         # cửa sổ run-rate cho dự phóng
+  bootstrap_resamples: 500          # khoảng P10-P90; MỤC CẮT ĐẦU TIÊN nếu thiếu thời gian
+
+baseline:
+  clean_days_lookback: 56           # cửa sổ ngày sạch để ước lượng mức nền
+  min_clean_weeks: 8                # tối thiểu để chỉ số thứ-trong-tuần đáng tin
+  post_promo_exclusion_days: 14     # loại 14 ngày sau mỗi đợt KM (sụt giảm hậu khuyến mãi)
+  trim_share: 0.025                 # cắt 2.5% cao nhất + 2.5% thấp nhất
+  control_trend_clip: [0.8, 1.2]    # kẹp hệ số xu hướng -> không để nhóm đối chứng kéo lệch
+  min_control_stores: 10            # không đủ -> trend = 1.0
+  # TODO(DS): xác nhận danh sách ngày lễ loại trừ (Tết căn theo ÂM LỊCH) cho 2026-2027.
+  #           Xem Business/06-open-questions.md Q16.
+
+rules:
+  # ROI chậm so với kế hoạch.
+  # early  = mức Trung bình, từ ngày 3  -> chỉ cảnh báo, CHƯA cho phép chuyển tiền
+  # confirmed = mức Cao, từ ngày 7, khi cận trên khoảng dự phóng cũng dưới kế hoạch
+  #           -> mở khóa REALLOCATE_UNCOMMITTED_FUNDS
+  roi_behind_plan:
+    max_relative_gap: -0.20
+    consecutive_evaluations: 2
+    early: medium
+    confirmed: high
+
+  low_lift:
+    max_ratio_to_planned_lift: 0.60
+    severity: medium
+
+  # Hết hàng: kiểm định Poisson CHỈ TỪ POS (không tin tồn kho hệ thống - 65% bản ghi sai).
+  stockout_suspected:
+    max_probability: 0.001          # P = exp(-sum(lambda_d)) phải NHỎ HƠN mức này
+    min_zero_days: 2                # 2 ngày liên tiếp -> báo động giả 7.7% (1 ngày -> 37%)
+    high_if_store_share_at_least: 0.10
+
+  # Giá khuyến mãi không được áp tại kệ/POS.
+  discount_not_applied:
+    min_discount_floor: 0.05
+    max_ratio_to_planned_discount: 0.50
+    min_days: 3
+    min_pooled_units: 5             # gộp ngày cho tới khi đủ sản lượng mới kết luận
+
+  spend_overrun:
+    max_ratio_to_plan_to_date: 1.15
+    severity: medium
+
+  # Chương trình vượt kế hoạch -> ứng viên NHẬN phân bổ lại.
+  outperforming:
+    min_relative_gap: 0.20

@@ -1,0 +1,23 @@
+# Dữ liệu sinh ra (tất định theo seed -> dựng lại bằng `midflight generate --seed 7`)
+data/*.csv
+data/*.duckdb
+data/*.json
+!data/fixtures/
+
+# Đầu ra kiểm tra lệch
+drift.json
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+
+# Môi trường
+.env
+.env.local
+
+# Hệ điều hành
+.DS_Store

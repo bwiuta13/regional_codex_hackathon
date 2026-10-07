@@ -1,0 +1,46 @@
+# TODO(D-data): quản lý bằng uv. `uv sync` phải chạy được ngay sau khi clone.
+[project]
+name = "midflight"
+version = "0.1.0"
+description = "AI agent giám sát ROI khuyến mãi thương mại khi chương trình đang chạy"
+requires-python = ">=3.12"
+dependencies = [
+    "typer>=0.12",        # CLI = các giai đoạn pipeline
+    "duckdb>=1.0",        # SQL dạng cột, window function, đọc thẳng CSV; không cần vận hành
+    "pydantic>=2.7",      # hợp đồng snapshot (frozen) + Structured Outputs
+    "pyyaml>=6.0",        # config/thresholds.yaml, config/policy.yaml
+    "pandas>=2.2",        # chỉ ở RÌA UI, nối sang biểu đồ. Công thức nằm trong SQL.
+    "jinja2>=3.1",        # hồ sơ chênh lệch
+    "streamlit>=1.37",    # dashboard
+    "plotly>=5.22",       # biểu đồ
+    "openai>=1.40",       # Responses API + Structured Outputs
+]
+
+[project.scripts]
+midflight = "midflight.cli:app"
+
+[dependency-groups]
+dev = [
+    "pytest>=8",
+    "hypothesis>=6",      # test thuộc tính (bất biến)
+    "ruff>=0.5",          # lint + format trong vài giây
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/midflight"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+# TODO(B-agent): thêm option --live để GHI LẠI phản hồi LLM (mặc định offline).

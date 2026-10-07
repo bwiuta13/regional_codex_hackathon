@@ -1,0 +1,42 @@
+{# =============================================================================
+   Mẫu hồ sơ chênh lệch — src/midflight/templates/variance_dossier.md.j2
+
+   TODO(D-data): điền mẫu này. Mọi giá trị đến từ snapshot + decisions, ĐÃ ĐƯỢC ĐỊNH DẠNG.
+                 KHÔNG tính toán trong mẫu.
+   ============================================================================= #}
+# Hồ sơ chênh lệch — {{ promo.promo_id }} · {{ promo.retailer }}
+
+{# TODO(D-data): bảng tóm tắt kế hoạch vs thực tế vs dự phóng #}
+
+## 1. Tóm tắt
+
+{# TODO(D-data): headline + 3-4 dòng chẩn đoán từ recommendation #}
+
+## 2. Bằng chứng thực thi
+
+### 2.1 Hết hàng
+{# TODO(D-data): tổng số cửa hàng-ngày + bảng cửa hàng x ngày + sản lượng mất ước tính #}
+
+### 2.2 Không tuân thủ giá khuyến mãi
+{# TODO(D-data): tổng số cửa hàng-ngày + phần ĐỐI SOÁT SCAN REBATE:
+                 ta đã trả rebate cho bao nhiêu cửa hàng-ngày không hề giảm giá? #}
+
+### 2.3 Thực thi khoản phí trưng bày
+{# TODO(D-data): số tiền đã trả vs bằng chứng thực thi quan sát được #}
+
+## 3. Quyết định đã ghi nhận
+
+{# TODO(D-data): bảng từ nhật ký kiểm toán — ai, khi nào, duyệt/từ chối/hoãn, LÝ DO #}
+
+## 4. Những gì chúng tôi đã KHÔNG thay đổi
+
+{# TODO(D-data): từ recommendation.not_changing.
+                 Đây là phần thể hiện ta tôn trọng cam kết -> tăng uy tín khi đàm phán. #}
+
+## 5. ⚠️ Giới hạn đã biết
+
+{# TODO(D-data): BẮT BUỘC có. Chưa tính ăn mòn doanh số, hiệu ứng lan tỏa, sụt giảm hậu
+                 khuyến mãi, gom hàng trước. Dự phóng dùng phương pháp {{ projection.method }}. #}
+
+---
+*Sinh bởi MidFlight · snapshot `{{ snapshot_id }}` · metric_version `{{ metric_version }}`*

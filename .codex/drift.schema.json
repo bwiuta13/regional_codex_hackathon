@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "MethodologyDriftReport",
+  "description": "Kết quả kiểm tra lệch giữa docs/roi-methodology.md và code. CI fail nếu drifts rỗng khác true.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["drifts", "checked_files"],
+  "properties": {
+    "checked_files": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "drifts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["file", "line", "doc_says", "code_says", "severity"],
+        "properties": {
+          "file":     { "type": "string" },
+          "line":     { "type": "integer" },
+          "doc_says": { "type": "string", "description": "Công thức/ngưỡng theo docs/roi-methodology.md" },
+          "code_says":{ "type": "string", "description": "Công thức/ngưỡng thực tế trong code" },
+          "severity": { "type": "string", "enum": ["high", "medium", "low"] }
+        }
+      }
+    }
+  }
+}

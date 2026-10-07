@@ -1,0 +1,25 @@
+# TODO(D-data): hoàn thiện trong ngày thi.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v3
+      - run: uv sync
+      - run: uv run ruff check .
+      # 🌐 Test chạy HOÀN TOÀN OFFLINE trên tests/recordings/ -> không cần OPENAI_API_KEY.
+      - run: uv run pytest -q
+
+  # TODO(D-data): job kiểm tra lệch phương pháp. Cần Codex trong CI.
+  #   Báo lỗi nếu drift.json liệt kê bất kỳ điểm lệch nào giữa
+  #   docs/roi-methodology.md và evaluate.py / alert.py.
+  # drift:
+  #   runs-on: ubuntu-latest
+  #   steps: ...

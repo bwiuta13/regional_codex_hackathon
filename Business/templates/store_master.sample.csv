@@ -1,0 +1,11 @@
+store_id,retailer_id,format,region,open_date,close_date
+CHM-0001,CHM,minimart,HCMC,2023-04-01,
+CHM-0002,CHM,minimart,HCMC,2023-06-15,
+CHM-0085,CHM,minimart,Hanoi,2024-01-10,
+CHM-0112,CHM,minimart,Danang,2024-08-01,
+CHM-0120,CHM,minimart,HCMC,2026-10-05,
+CHH-0001,CHH,hypermarket,HCMC,2019-03-01,
+CHH-0002,CHH,hypermarket,Hanoi,2020-11-20,
+CHH-0021,CHH,hypermarket,HCMC,2021-05-05,
+CHH-0022,CHH,hypermarket,Cantho,2022-02-18,
+CHC-0001,CHC,convenience,HCMC,2022-07-01,2026-09-30

@@ -1,0 +1,9 @@
+promo_id,store_id,sku_id,has_secondary_display,has_pg
+P-03,CHM-0001,SKU-A18,false,true
+P-03,CHM-0002,SKU-A18,false,true
+P-03,CHM-0085,SKU-A18,false,true
+P-03,CHM-0112,SKU-A18,false,true
+P-05,CHH-0001,SKU-A18,true,false
+P-05,CHH-0002,SKU-A18,true,false
+P-05,CHH-0021,SKU-A18,false,false
+P-05,CHH-0022,SKU-A18,false,false
